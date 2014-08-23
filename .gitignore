@@ -1,0 +1,10 @@
+_build/
+bin/
+*.swp
+~*
+otaro.native
+otaro.byte
+_obuild/
+ocp-build.root
+ocp-build.root*old
+otaro

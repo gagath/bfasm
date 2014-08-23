@@ -1,0 +1,6 @@
+begin program "bfasm"
+  sort = true
+  files = ["src/bfasm.ml"]
+  requires = ["unix"]
+  byte = false
+end

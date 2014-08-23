@@ -1,0 +1,8 @@
+# bfasm, an assembler for Brainfuck
+
+Still WIP.
+
+## Copyright
+
+This project is brought to you under GNU Affero General Public Licence v3+. For
+further informations please read the provided COPYING file.
