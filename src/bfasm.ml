@@ -54,7 +54,11 @@ let rec reverse is =
   done;
   s
 
+(* Convert an instr to a ctxbf item *)
 let rec bf_of_instr (addr:adress) previous inst =
+  (* Function to call and return when nothing is left to be done ; can be
+   * called in some specialized pattern matching entries in order to optimize
+   * a little bit. *)
   let finalize = fun () -> (addr, String.concat "" previous) in
   match inst with
   (* Add *)
