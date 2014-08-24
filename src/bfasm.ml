@@ -56,6 +56,7 @@ let rec reverse is =
 
 let rec bf_of_instr (addr:adress) previous inst = match inst with
 (* Add *)
+| Add (dst, 0) -> (addr, String.concat "" previous)
 | Add (dst, value) ->
     let (new_addr, new_bf) = bf_of_instr addr previous (Move (dst)) in
     bf_of_instr new_addr (new_bf::previous) (LocalAdd (value))
