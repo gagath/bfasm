@@ -54,36 +54,38 @@ let rec reverse is =
   done;
   s
 
-let rec bf_of_instr (addr:adress) previous inst = match inst with
-(* Add *)
-| Add (dst, 0) -> (addr, String.concat "" previous)
-| Add (dst, value) ->
-    let (new_addr, new_bf) = bf_of_instr addr previous (Move (dst)) in
-    bf_of_instr new_addr (new_bf::previous) (LocalAdd (value))
-(* LocalAdd *)
-| LocalAdd 0 -> (addr, String.concat "" previous)
-| LocalAdd (value) ->
-    let chr = if value > 0 then '+' else '-' in
-    let s = repeat chr (abs value) in
-    let b = String.concat "" (s::previous) in
-    (* We have to reverse generated BF code because of lists which add to head
-     * instead of to queue *)
-    (addr, reverse b)
-(* Move *)
-| Move x when x == addr -> (addr, String.concat "" previous)
-| Move dst ->
-    (* TODO:
-     * handle recursivity in something like RecLeft and RecRight instrs *)
-    let diff = addr - dst in
-    let dir = if diff < 0 then Right else Left in
-    let (new_addr, new_bf) = bf_of_instr addr previous dir in
-    bf_of_instr new_addr (new_bf::previous) (Move dst)
-(* Left *)
-| Left ->
-    (addr - 1, "<")
-(* Right *)
-| Right ->
-    (addr + 1, ">")
+let rec bf_of_instr (addr:adress) previous inst =
+  let finalize = fun () -> (addr, String.concat "" previous) in
+  match inst with
+  (* Add *)
+  | Add (dst, 0) -> finalize ()
+  | Add (dst, value) ->
+      let (new_addr, new_bf) = bf_of_instr addr previous (Move (dst)) in
+      bf_of_instr new_addr (new_bf::previous) (LocalAdd (value))
+  (* LocalAdd *)
+  | LocalAdd 0 -> finalize ()
+  | LocalAdd (value) ->
+      let chr = if value > 0 then '+' else '-' in
+      let s = repeat chr (abs value) in
+      let b = String.concat "" (s::previous) in
+      (* We have to reverse generated BF code because of lists which add to head
+       * instead of to queue *)
+      (addr, reverse b)
+  (* Move *)
+  | Move x when x == addr -> finalize ()
+  | Move dst ->
+      (* TODO:
+       * handle recursivity in something like RecLeft and RecRight instrs *)
+      let diff = addr - dst in
+      let dir = if diff < 0 then Right else Left in
+      let (new_addr, new_bf) = bf_of_instr addr previous dir in
+      bf_of_instr new_addr (new_bf::previous) (Move dst)
+  (* Left *)
+  | Left ->
+      (addr - 1, "<")
+  (* Right *)
+  | Right ->
+      (addr + 1, ">")
 
 (* Main program, tries to parse some high level instr *)
 let () =
