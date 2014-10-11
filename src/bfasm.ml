@@ -32,6 +32,8 @@ type instr =
   (* Final state low level instructions *)
   | Left
   | Right
+  | Output
+  | Input
 
 (* Brainfuck code *)
 type bf = string
@@ -90,12 +92,41 @@ let rec bf_of_instr (addr:adress) previous inst =
   (* Right *)
   | Right ->
       (addr + 1, ">")
+  (* Output *)
+  | Output ->
+      (addr, ".")
+  | Input ->
+      (addr, ",")
 
 (* Main program, tries to parse some high level instr *)
-let () =
+(*let () =
   (* Wow, this really looks like a monad, maybe do something about it
    * (implement a monad in OCaml ?) *)
   let (na, s) = bf_of_instr 0 [] (Add (10, -10)) in
   let (na', s') = bf_of_instr na [] (Move 0) in
   let (na2, s2) = bf_of_instr na' [] (Add (9, 10)) in
   Printf.printf "add 10 -10\n%s\nmove 0\n%s\nadd 9 10\n%s\n" s s' s2
+  *)
+
+let eval l =
+  let rec eval' l pos prev acc = match l with
+  | [] -> acc
+  | (x::xs) -> begin
+    let (na, s) = bf_of_instr pos prev x in
+    eval' xs na prev s
+  end in
+  eval' l 0 [] []
+
+let () =
+  let uni = [
+    Add (0, 0xe2);
+    Output;
+    Add (0, -0x60);
+    Output;
+    Add (0, 0x2a);
+    Output;
+    Add (0, -0x20)
+  ] in
+
+  let (na, s) = bf_of_instr 0 [] (Add (0, 0xe2)) in
+  Printf.printf "%s" s
